@@ -5,14 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}VibeCheck — API Key Exposure Scanner{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'scanner/style.css' %}">
 </head>
 <body>
   <div class="wrap">
     {% block content %}{% endblock %}
     <footer>
-      VibeCheck scans only what your page already sends to every visitor's browser — it never brute-forces
-      or accesses anything private. Built for vibecoders shipping fast with AI-generated apps.
+      VibeCheck reads only what a visitor's browser already receives — HTML, linked JS bundles, and HTTP headers.
+      It never brute-forces paths or touches anything behind a login wall.
     </footer>
   </div>
 </body>

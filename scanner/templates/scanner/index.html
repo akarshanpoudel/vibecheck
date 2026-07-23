@@ -1,59 +1,60 @@
 {% extends "scanner/base.html" %}
 
 {% block content %}
-  <div class="eyebrow">Client-side exposure scanner</div>
-  <h1>Your app ships fast.<br>Does it also ship<span class="hl"> your API keys?</span></h1>
+  <span class="overline">Client-side exposure scanner</span>
+  <h1>Your app ships fast.<br>Do your keys ship with it?</h1>
   <p class="sub">
-    Paste the URL of your vibecoded app. VibeCheck reads exactly what a
-    visitor's browser already sees — HTML, JS bundles, headers — and flags
-    LLM API keys, open endpoints, and CORS mistakes before someone else finds them.
+    Paste a URL. VibeCheck reads exactly what any visitor's browser already
+    receives and flags exposed LLM API keys, open endpoints, and CORS mistakes
+    before someone else finds them.
   </p>
 
-  <div class="scan-frame">
+  <div class="scan-area">
     <form class="scan-form" method="post">
       {% csrf_token %}
       {{ form.target_url }}
       {% if form.target_url.errors %}
-        <ul class="errorlist">{% for e in form.target_url.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        <ul class="errorlist">
+          {% for e in form.target_url.errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
       {% endif %}
-      <button class="btn" type="submit">Run scan</button>
+      <button class="btn" type="submit">Scan</button>
     </form>
     <p class="disclaimer">
-      Only checks what's already public in your page source and JS files. No login walls,
-      no brute-forcing, no third-party domains touched beyond your own host.
+      Only checks what's already public. No login walls, no brute-forcing, no
+      third-party domains probed beyond your target host.
     </p>
   </div>
 
-  <div class="checks-grid">
-    <div class="check-card">
-      <span class="label">01 · LLM keys</span>
-      <p>OpenAI, Anthropic, Gemini, Groq, Mistral, Replicate, OpenRouter and more — scanned in your HTML and every linked JS bundle.</p>
+  <h2>What we check</h2>
+  <dl class="features">
+    <div class="feature-row">
+      <dt>LLM keys</dt>
+      <dd>OpenAI, Anthropic, Gemini, Groq, Mistral, Replicate, Together, xAI, DeepSeek, Fireworks, Tavily, and more — scanned across your HTML and every linked JS bundle.</dd>
     </div>
-    <div class="check-card">
-      <span class="label">02 · Open endpoints</span>
-      <p>API routes referenced in your JS get a single, safe GET request to see if they respond without any authentication.</p>
+    <div class="feature-row">
+      <dt>Open endpoints</dt>
+      <dd>API routes referenced in your JS get a single safe GET to check whether they respond without any authentication.</dd>
     </div>
-    <div class="check-card">
-      <span class="label">03 · CORS misconfig</span>
-      <p>Flags wildcard or overly permissive Access-Control-Allow-Origin headers, especially combined with credentials.</p>
+    <div class="feature-row">
+      <dt>CORS misconfig</dt>
+      <dd>Flags wildcard or overly permissive Access-Control-Allow-Origin headers, especially when combined with credentials.</dd>
     </div>
-    <div class="check-card">
-      <span class="label">04 · Fix, not just find</span>
-      <p>Every finding comes with a concrete recommendation — what to rotate, what to move server-side, what to rate-limit.</p>
+    <div class="feature-row">
+      <dt>Fix guidance</dt>
+      <dd>Every finding comes with a concrete recommendation — what to rotate, what to move server-side, what to rate-limit.</dd>
     </div>
-  </div>
+  </dl>
 
   {% if recent_scans %}
-    <div class="recent">
-      <h2>Recent scans</h2>
-      <ul>
-        {% for s in recent_scans %}
-          <li>
-            <a href="{% url 'scanner:result' s.id %}">{{ s.target_url }}</a>
-            <span>{{ s.created_at|date:"M j, H:i" }}</span>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
+    <h2>Recent scans</h2>
+    <ul class="recent-list">
+      {% for s in recent_scans %}
+        <li>
+          <a href="{% url 'scanner:result' s.id %}">{{ s.target_url }}</a>
+          <span class="ts">{{ s.created_at|date:"M j, H:i" }}</span>
+        </li>
+      {% endfor %}
+    </ul>
   {% endif %}
 {% endblock %}
