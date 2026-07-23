@@ -1,37 +1,69 @@
 {% extends "scanner/base.html" %}
 
 {% block content %}
-  <div class="eyebrow">Scan result</div>
 
-  {% if not scan.ok %}
+  {# ---- Async: scan still running ---- #}
+  {% if scan.status == "pending" %}
+    <span class="overline">Scanning</span>
+    <h1>{{ scan.target_url }}</h1>
+    <div class="pending-state">
+      <div class="scan-indicator"></div>
+      <p class="msg">Fetching page source and linked JS assets&hellip;</p>
+      <p class="hint">Usually finishes in 5–15 seconds.</p>
+    </div>
+    <script>
+      (function () {
+        var delay = 2500;
+        function poll() {
+          fetch("{% url 'scanner:status' scan.id %}")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d.status !== "pending") {
+                window.location.reload();
+              } else {
+                setTimeout(poll, delay);
+              }
+            })
+            .catch(function () { setTimeout(poll, delay * 2); });
+        }
+        setTimeout(poll, delay);
+      })();
+    </script>
+
+  {# ---- Fetch failed ---- #}
+  {% elif not scan.ok %}
+    <span class="overline">Scan result</span>
     <h1>Couldn't reach that URL</h1>
     <div class="error-box">{{ scan.error }}</div>
     <a class="back-link" href="{% url 'scanner:index' %}">&larr; Try another URL</a>
-  {% else %}
-    <h1>{% if is_clean %}Looking clean<span class="hl">.</span>{% else %}Found something<span class="hl">.</span>{% endif %}</h1>
 
-    <div class="result-header">
+  {# ---- Findings ---- #}
+  {% else %}
+    <span class="overline">Scan result</span>
+    <h1>{% if is_clean %}Looking clean.{% else %}Found something.{% endif %}</h1>
+
+    <div class="result-meta">
       <div class="target-url">{{ scan.target_url }}</div>
-      {% if is_clean %}
-        <div class="tally"><span class="pill clean"><span class="dot"></span>0 issues found</span></div>
-      {% else %}
-        <div class="tally">
+      <div class="tally">
+        {% if is_clean %}
+          <span class="pill clean"><span class="dot"></span>0 issues</span>
+        {% else %}
           {% if counts.critical %}<span class="pill critical"><span class="dot"></span>{{ counts.critical }} critical</span>{% endif %}
           {% if counts.high %}<span class="pill high"><span class="dot"></span>{{ counts.high }} high</span>{% endif %}
           {% if counts.medium %}<span class="pill medium"><span class="dot"></span>{{ counts.medium }} medium</span>{% endif %}
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
 
     {% if is_clean %}
       <div class="clean-banner">
         <div class="big">No exposed keys, open endpoints, or CORS issues detected</div>
-        <p>This only covers what's visible in your page's HTML and linked JS — it isn't a full security audit. Dynamically-loaded scripts or keys fetched at runtime could still slip past a client-side scan.</p>
+        <p>This only covers what's visible in your page's HTML and linked JS. Keys fetched at runtime or loaded via dynamic imports won't appear in a client-side scan.</p>
       </div>
     {% endif %}
 
     {% if llm_findings %}
-      <div class="section-title">🔑 LLM API keys exposed</div>
+      <div class="section-title">LLM API keys exposed</div>
       {% for f in llm_findings %}
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
@@ -46,7 +78,7 @@
     {% endif %}
 
     {% if endpoint_findings %}
-      <div class="section-title">🌐 Unauthenticated endpoints</div>
+      <div class="section-title">Unauthenticated endpoints</div>
       {% for f in endpoint_findings %}
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
@@ -61,7 +93,7 @@
     {% endif %}
 
     {% if cors_findings %}
-      <div class="section-title">🔓 CORS configuration</div>
+      <div class="section-title">CORS configuration</div>
       {% for f in cors_findings %}
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
@@ -76,7 +108,7 @@
     {% endif %}
 
     {% if other_secret_findings %}
-      <div class="section-title">🗝️ Other exposed secrets</div>
+      <div class="section-title">Other exposed secrets</div>
       {% for f in other_secret_findings %}
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
@@ -92,4 +124,5 @@
 
     <a class="back-link" href="{% url 'scanner:index' %}">&larr; Scan another URL</a>
   {% endif %}
+
 {% endblock %}

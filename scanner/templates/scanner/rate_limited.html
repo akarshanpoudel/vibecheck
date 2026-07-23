@@ -1,0 +1,13 @@
+{% extends "scanner/base.html" %}
+
+{% block title %}Rate limited — VibeCheck{% endblock %}
+
+{% block content %}
+  <span class="overline">Rate limited</span>
+  <h1>Slow down a bit.</h1>
+  <div class="rate-limit-msg">
+    <p>You've hit the scan limit — {{ limit }} scans per hour per IP.</p>
+    <p>The window resets automatically. Try again in about {{ retry_after }} minutes.</p>
+  </div>
+  <a class="back-link" href="{% url 'scanner:index' %}">&larr; Back</a>
+{% endblock %}
