@@ -1,19 +1,18 @@
 """
 Pattern library for detecting exposed API keys and secrets in client-side
-(HTML/JS) source. Focused on LLM provider keys, since that's the #1 way
-vibecoded apps leak money-bleeding credentials, plus common
-general-purpose cloud/service keys for broader coverage.
+(HTML/JS) source. Focused on LLM provider keys, plus common cloud/service
+keys for broader coverage.
 
 Each entry:
-    name        -> human readable provider/service name
-    pattern     -> compiled regex
-    severity    -> "critical" | "high" | "medium"
-    category    -> "llm" | "cloud" | "payment" | "generic"
+    name      -> human-readable provider/service name
+    pattern   -> compiled regex
+    severity  -> "critical" | "high" | "medium"
+    category  -> "llm" | "cloud" | "payment" | "generic"
 """
 import re
 
 KEY_PATTERNS = [
-    # ---- LLM providers (primary focus) ----
+    # ---- LLM providers ----
     dict(
         name="OpenAI API Key",
         pattern=re.compile(r"\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\b"),
@@ -69,19 +68,43 @@ KEY_PATTERNS = [
         category="llm",
     ),
     dict(
-        name="ElevenLabs API Key",
-        pattern=re.compile(r"\b[a-f0-9]{32}\b(?=.{0,40}elevenlabs)", re.IGNORECASE),
-        severity="high",
-        category="llm",
-    ),
-    dict(
         name="OpenRouter API Key",
         pattern=re.compile(r"\bsk-or-v1-[A-Za-z0-9]{20,}\b"),
         severity="critical",
         category="llm",
     ),
+    dict(
+        name="xAI (Grok) API Key",
+        pattern=re.compile(r"\bxai-[A-Za-z0-9]{40,}\b"),
+        severity="critical",
+        category="llm",
+    ),
+    dict(
+        name="Fireworks AI API Key",
+        pattern=re.compile(r"\bfw_[A-Za-z0-9]{32,}\b"),
+        severity="critical",
+        category="llm",
+    ),
+    dict(
+        name="Tavily AI API Key",
+        pattern=re.compile(r"\btvly-[A-Za-z0-9]{32,}\b"),
+        severity="high",
+        category="llm",
+    ),
+    dict(
+        name="Cerebras API Key",
+        pattern=re.compile(r"\bcsk-[A-Za-z0-9]{32,}\b"),
+        severity="critical",
+        category="llm",
+    ),
+    dict(
+        name="ElevenLabs API Key",
+        pattern=re.compile(r"\b[a-f0-9]{32}\b(?=.{0,40}elevenlabs)", re.IGNORECASE),
+        severity="high",
+        category="llm",
+    ),
 
-    # ---- Cloud / infra (common in vibecoded backends-as-a-service) ----
+    # ---- Cloud / infra ----
     dict(
         name="AWS Access Key ID",
         pattern=re.compile(r"\b(AKIA|ASIA)[0-9A-Z]{16}\b"),
@@ -101,13 +124,32 @@ KEY_PATTERNS = [
         category="cloud",
     ),
     dict(
-        name="Generic Slack Token",
+        name="Slack Token",
         pattern=re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
         severity="high",
         category="cloud",
     ),
+    dict(
+        name="GitHub Personal Access Token",
+        pattern=re.compile(r"\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36}\b"),
+        severity="critical",
+        category="cloud",
+    ),
+    dict(
+        name="GitHub Fine-Grained PAT",
+        pattern=re.compile(r"\bgithub_pat_[A-Za-z0-9_]{82}\b"),
+        severity="critical",
+        category="cloud",
+    ),
+    dict(
+        name="Mapbox Public Token",
+        # pk.eyJ1 is the b64 of {"u" (start of a JSON user claim)
+        pattern=re.compile(r"\bpk\.eyJ1[A-Za-z0-9._-]{20,}\b"),
+        severity="medium",
+        category="cloud",
+    ),
 
-    # ---- Payments ----
+    # ---- Payments & comms ----
     dict(
         name="Stripe Secret Key",
         pattern=re.compile(r"\bsk_live_[A-Za-z0-9]{24,}\b"),
@@ -120,16 +162,35 @@ KEY_PATTERNS = [
         severity="critical",
         category="payment",
     ),
-
-    # ---- Generic catch-alls ----
     dict(
-        name="Generic Bearer Token in Source",
+        name="SendGrid API Key",
+        pattern=re.compile(r"\bSG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}\b"),
+        severity="high",
+        category="payment",
+    ),
+    dict(
+        name="Resend API Key",
+        pattern=re.compile(r"\bre_[A-Za-z0-9_]{20,}\b"),
+        severity="high",
+        category="payment",
+    ),
+    dict(
+        name="Twilio API Key",
+        # SK + 32 hex — distinct from Stripe's sk_live_ prefix
+        pattern=re.compile(r"\bSK[0-9a-fA-F]{32}\b"),
+        severity="high",
+        category="payment",
+    ),
+
+    # ---- Generic catch-alls (lowest priority, most noise) ----
+    dict(
+        name="Bearer Token in Source",
         pattern=re.compile(r"Bearer\s+[A-Za-z0-9_\-\.=]{20,}"),
         severity="medium",
         category="generic",
     ),
     dict(
-        name="Hardcoded 'apiKey' / 'api_key' Assignment",
+        name="Hardcoded API Key Assignment",
         pattern=re.compile(
             r"""(?i)(api[_-]?key|secret[_-]?key|access[_-]?token)\s*[:=]\s*["']([A-Za-z0-9_\-\.]{16,})["']"""
         ),
@@ -138,6 +199,4 @@ KEY_PATTERNS = [
     ),
 ]
 
-# Providers whose keys, if exposed client-side, directly translate into
-# an attacker being able to spend the app owner's money on LLM usage.
 LLM_KEY_NAMES = {p["name"] for p in KEY_PATTERNS if p["category"] == "llm"}

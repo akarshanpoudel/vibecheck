@@ -55,7 +55,31 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# After the MIDDLEWARE list, add the cache backend:
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        # Swap for Redis in prod:
+        # "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        # "LOCATION": "redis://127.0.0.1:6379/1",
+    }
+}
 
+# Replace the DATABASES block:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+        "OPTIONS": {
+            "timeout": 20,   # seconds to wait on a locked DB (needed for threaded writes)
+        },
+    }
+}
+# Suppress the auto-field warning:
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Suppress the auto-field warning:
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 ROOT_URLCONF = 'vibecheck.urls'
 
 TEMPLATES = [
