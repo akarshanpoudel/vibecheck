@@ -1,0 +1,59 @@
+{% extends "scanner/base.html" %}
+
+{% block content %}
+  <div class="eyebrow">Client-side exposure scanner</div>
+  <h1>Your app ships fast.<br>Does it also ship<span class="hl"> your API keys?</span></h1>
+  <p class="sub">
+    Paste the URL of your vibecoded app. VibeCheck reads exactly what a
+    visitor's browser already sees — HTML, JS bundles, headers — and flags
+    LLM API keys, open endpoints, and CORS mistakes before someone else finds them.
+  </p>
+
+  <div class="scan-frame">
+    <form class="scan-form" method="post">
+      {% csrf_token %}
+      {{ form.target_url }}
+      {% if form.target_url.errors %}
+        <ul class="errorlist">{% for e in form.target_url.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+      {% endif %}
+      <button class="btn" type="submit">Run scan</button>
+    </form>
+    <p class="disclaimer">
+      Only checks what's already public in your page source and JS files. No login walls,
+      no brute-forcing, no third-party domains touched beyond your own host.
+    </p>
+  </div>
+
+  <div class="checks-grid">
+    <div class="check-card">
+      <span class="label">01 · LLM keys</span>
+      <p>OpenAI, Anthropic, Gemini, Groq, Mistral, Replicate, OpenRouter and more — scanned in your HTML and every linked JS bundle.</p>
+    </div>
+    <div class="check-card">
+      <span class="label">02 · Open endpoints</span>
+      <p>API routes referenced in your JS get a single, safe GET request to see if they respond without any authentication.</p>
+    </div>
+    <div class="check-card">
+      <span class="label">03 · CORS misconfig</span>
+      <p>Flags wildcard or overly permissive Access-Control-Allow-Origin headers, especially combined with credentials.</p>
+    </div>
+    <div class="check-card">
+      <span class="label">04 · Fix, not just find</span>
+      <p>Every finding comes with a concrete recommendation — what to rotate, what to move server-side, what to rate-limit.</p>
+    </div>
+  </div>
+
+  {% if recent_scans %}
+    <div class="recent">
+      <h2>Recent scans</h2>
+      <ul>
+        {% for s in recent_scans %}
+          <li>
+            <a href="{% url 'scanner:result' s.id %}">{{ s.target_url }}</a>
+            <span>{{ s.created_at|date:"M j, H:i" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endblock %}

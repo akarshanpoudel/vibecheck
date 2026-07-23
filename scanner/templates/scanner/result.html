@@ -1,0 +1,95 @@
+{% extends "scanner/base.html" %}
+
+{% block content %}
+  <div class="eyebrow">Scan result</div>
+
+  {% if not scan.ok %}
+    <h1>Couldn't reach that URL</h1>
+    <div class="error-box">{{ scan.error }}</div>
+    <a class="back-link" href="{% url 'scanner:index' %}">&larr; Try another URL</a>
+  {% else %}
+    <h1>{% if is_clean %}Looking clean<span class="hl">.</span>{% else %}Found something<span class="hl">.</span>{% endif %}</h1>
+
+    <div class="result-header">
+      <div class="target-url">{{ scan.target_url }}</div>
+      {% if is_clean %}
+        <div class="tally"><span class="pill clean"><span class="dot"></span>0 issues found</span></div>
+      {% else %}
+        <div class="tally">
+          {% if counts.critical %}<span class="pill critical"><span class="dot"></span>{{ counts.critical }} critical</span>{% endif %}
+          {% if counts.high %}<span class="pill high"><span class="dot"></span>{{ counts.high }} high</span>{% endif %}
+          {% if counts.medium %}<span class="pill medium"><span class="dot"></span>{{ counts.medium }} medium</span>{% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if is_clean %}
+      <div class="clean-banner">
+        <div class="big">No exposed keys, open endpoints, or CORS issues detected</div>
+        <p>This only covers what's visible in your page's HTML and linked JS — it isn't a full security audit. Dynamically-loaded scripts or keys fetched at runtime could still slip past a client-side scan.</p>
+      </div>
+    {% endif %}
+
+    {% if llm_findings %}
+      <div class="section-title">🔑 LLM API keys exposed</div>
+      {% for f in llm_findings %}
+        <div class="finding-card {{ f.severity }}">
+          <div class="finding-top">
+            <div class="finding-title">{{ f.title }}</div>
+            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+          </div>
+          <div class="finding-location">{{ f.location }}</div>
+          <div class="evidence">{{ f.evidence }}</div>
+          <div class="recommendation"><strong>Fix:</strong> {{ f.recommendation }}</div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if endpoint_findings %}
+      <div class="section-title">🌐 Unauthenticated endpoints</div>
+      {% for f in endpoint_findings %}
+        <div class="finding-card {{ f.severity }}">
+          <div class="finding-top">
+            <div class="finding-title">{{ f.title }}</div>
+            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+          </div>
+          <div class="finding-location">{{ f.location }}</div>
+          <div class="evidence">{{ f.evidence }}</div>
+          <div class="recommendation"><strong>Fix:</strong> {{ f.recommendation }}</div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if cors_findings %}
+      <div class="section-title">🔓 CORS configuration</div>
+      {% for f in cors_findings %}
+        <div class="finding-card {{ f.severity }}">
+          <div class="finding-top">
+            <div class="finding-title">{{ f.title }}</div>
+            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+          </div>
+          <div class="finding-location">{{ f.location }}</div>
+          <div class="evidence">{{ f.evidence }}</div>
+          <div class="recommendation"><strong>Fix:</strong> {{ f.recommendation }}</div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if other_secret_findings %}
+      <div class="section-title">🗝️ Other exposed secrets</div>
+      {% for f in other_secret_findings %}
+        <div class="finding-card {{ f.severity }}">
+          <div class="finding-top">
+            <div class="finding-title">{{ f.title }}</div>
+            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+          </div>
+          <div class="finding-location">{{ f.location }}</div>
+          <div class="evidence">{{ f.evidence }}</div>
+          <div class="recommendation"><strong>Fix:</strong> {{ f.recommendation }}</div>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <a class="back-link" href="{% url 'scanner:index' %}">&larr; Scan another URL</a>
+  {% endif %}
+{% endblock %}
