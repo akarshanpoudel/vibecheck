@@ -79,7 +79,7 @@ if _pg_host:
             "ENGINE":       "django.db.backends.postgresql",
             "NAME":         os.environ.get("PGDATABASE", "vibecheck"),
             "USER":         os.environ.get("PGUSER",     "postgres"),
-            "PASSWORD":     os.environ.get("PGPASSWORD", ""),
+            "PASSWORD":     os.environ.get("Admin404!", ""),
             "HOST":         _pg_host,
             "PORT":         os.environ.get("PGPORT",     "5432"),
             "CONN_MAX_AGE": 60,   # reuse connections across requests in the same process
