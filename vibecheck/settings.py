@@ -65,17 +65,34 @@ CACHES = {
     }
 }
 
+# ------------------------------------------------------------------
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        "OPTIONS": {
-            "timeout": 20,   # seconds to wait on a locked DB (needed for threaded writes)
-        },
+#
+# Set PGHOST (plus the other PG* vars below) to switch to Postgres.
+# Leave unset to use SQLite — useful for local development.
+# ------------------------------------------------------------------
+_pg_host = os.environ.get("PGHOST")
+
+if _pg_host:
+    DATABASES = {
+        "default": {
+            "ENGINE":       "django.db.backends.postgresql",
+            "NAME":         os.environ.get("PGDATABASE", "vibecheck"),
+            "USER":         os.environ.get("PGUSER",     "postgres"),
+            "PASSWORD":     os.environ.get("PGPASSWORD", ""),
+            "HOST":         _pg_host,
+            "PORT":         os.environ.get("PGPORT",     "5432"),
+            "CONN_MAX_AGE": 60,   # reuse connections across requests in the same process
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE":  "django.db.backends.sqlite3",
+            "NAME":    BASE_DIR / "db.sqlite3",
+            "OPTIONS": {"timeout": 20},
+        }
+    }
 
 # Suppress the auto-field warning:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
