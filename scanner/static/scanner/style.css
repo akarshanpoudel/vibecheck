@@ -459,3 +459,9 @@ footer {
   border-top: 1px solid var(--faint);
   padding-top: 14px;
 }
+/* ---- Action row right group (re-scan + copy-link) ---- */
+.action-row-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
