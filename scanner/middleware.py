@@ -1,9 +1,8 @@
 """
 SecurityHeadersMiddleware — applied to every response.
 
-CSP uses 'unsafe-inline' for script-src because the result page embeds a
-small polling snippet inline. Day-5 improvement: move it to a static JS
-file and switch to a nonce.
+With the polling script moved to main.js (a static file served from 'self'),
+script-src no longer needs 'unsafe-inline'.
 """
 
 
@@ -12,7 +11,7 @@ class SecurityHeadersMiddleware:
         "default-src 'self'; "
         "style-src 'self' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com; "
-        "script-src 'self' 'unsafe-inline'; "
+        "script-src 'self'; "                           # ← no more 'unsafe-inline'
         "img-src 'self' data:; "
         "connect-src 'self'; "
         "frame-ancestors 'none';"
