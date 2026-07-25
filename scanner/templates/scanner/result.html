@@ -18,11 +18,8 @@
           fetch("{% url 'scanner:status' scan.id %}")
             .then(function (r) { return r.json(); })
             .then(function (d) {
-              if (d.status !== "pending") {
-                window.location.reload();
-              } else {
-                setTimeout(poll, delay);
-              }
+              if (d.status !== "pending") { window.location.reload(); }
+              else { setTimeout(poll, delay); }
             })
             .catch(function () { setTimeout(poll, delay * 2); });
         }
@@ -37,7 +34,7 @@
     <div class="error-box">{{ scan.error }}</div>
     <a class="back-link" href="{% url 'scanner:index' %}">&larr; Try another URL</a>
 
-  {# ---- Findings ---- #}
+  {# ---- Normal result ---- #}
   {% else %}
     <span class="overline">Scan result</span>
     <h1>{% if is_clean %}Looking clean.{% else %}Found something.{% endif %}</h1>
@@ -52,6 +49,10 @@
           {% if counts.high %}<span class="pill high"><span class="dot"></span>{{ counts.high }} high</span>{% endif %}
           {% if counts.medium %}<span class="pill medium"><span class="dot"></span>{{ counts.medium }} medium</span>{% endif %}
         {% endif %}
+      </div>
+      <div class="scan-stats">
+        {{ scan.assets_scanned|length }} JS file{{ scan.assets_scanned|length|pluralize }} scanned
+        {% if scan.endpoints_probed %}&middot; {{ scan.endpoints_probed|length }} endpoint{{ scan.endpoints_probed|length|pluralize }} probed{% endif %}
       </div>
     </div>
 
@@ -122,7 +123,14 @@
       {% endfor %}
     {% endif %}
 
-    <a class="back-link" href="{% url 'scanner:index' %}">&larr; Scan another URL</a>
-  {% endif %}
+    <div class="action-row">
+      <a class="back-link" href="{% url 'scanner:index' %}">&larr; Scan another URL</a>
+      <form method="post" action="{% url 'scanner:index' %}">
+        {% csrf_token %}
+        <input type="hidden" name="target_url" value="{{ scan.target_url }}">
+        <button class="btn-ghost" type="submit">Re-scan</button>
+      </form>
+    </div>
 
+  {% endif %}
 {% endblock %}

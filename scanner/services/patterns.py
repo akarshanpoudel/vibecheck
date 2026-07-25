@@ -111,9 +111,11 @@ KEY_PATTERNS = [
         severity="critical",
         category="cloud",
     ),
-    dict(
+   dict(
         name="Supabase Service Role Key (JWT)",
         pattern=re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b"),
+        context=re.compile(r"supabase|service[_-]?role", re.IGNORECASE),
+        context_window=300,  # chars either side of the match to search for context
         severity="high",
         category="cloud",
     ),
