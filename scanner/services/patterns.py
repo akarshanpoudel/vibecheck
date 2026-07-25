@@ -185,9 +185,11 @@ KEY_PATTERNS = [
     ),
 
     # ---- Generic catch-alls (lowest priority, most noise) ----
-    dict(
+ dict(
         name="Bearer Token in Source",
         pattern=re.compile(r"Bearer\s+[A-Za-z0-9_\-\.=]{20,}"),
+        context=re.compile(r"Authorization|[Hh]eaders|auth|fetch|axios|XMLHttpRequest", re.IGNORECASE),
+        context_window=200,
         severity="medium",
         category="generic",
     ),

@@ -12,11 +12,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from .env file
 load_dotenv()
-
-from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,15 +46,16 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "scanner.middleware.SecurityHeadersMiddleware",    # ← add directly after SecurityMiddleware
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-# After the MIDDLEWARE list, add the cache backend:
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
@@ -65,7 +65,8 @@ CACHES = {
     }
 }
 
-# Replace the DATABASES block:
+# Database
+# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -75,11 +76,10 @@ DATABASES = {
         },
     }
 }
-# Suppress the auto-field warning:
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Suppress the auto-field warning:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 ROOT_URLCONF = 'vibecheck.urls'
 
 TEMPLATES = [
@@ -98,17 +98,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'vibecheck.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
@@ -146,3 +135,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+# Security and Session Settings
+
+# Tells Django to trust the load balancer when it says the original request was HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Sessions — visitors keep their scan history for 90 days.
+SESSION_COOKIE_AGE      = 60 * 60 * 24 * 90  # 90 days
+SESSION_COOKIE_HTTPONLY = True                 # JS can't touch it
+SESSION_COOKIE_SAMESITE = "Lax"               # CSRF protection
+
+# Secure cookies flip to True automatically in production once DEBUG is False
+SESSION_COOKIE_SECURE   = not DEBUG            
+CSRF_COOKIE_SECURE      = not DEBUG

@@ -46,15 +46,27 @@
     </div>
   </dl>
 
+  <div class="history-header">
+    <h2>Your recent scans</h2>
+    {% if recent_scans %}
+      <form method="post" action="{% url 'scanner:clear_history' %}">
+        {% csrf_token %}
+        <button class="btn-ghost btn-ghost--sm" type="submit">Clear</button>
+      </form>
+    {% endif %}
+  </div>
+
   {% if recent_scans %}
-    <h2>Recent scans</h2>
     <ul class="recent-list">
       {% for s in recent_scans %}
         <li>
-          <a href="{% url 'scanner:result' s.id %}">{{ s.target_url }}</a>
+          <a href="{% url 'scanner:result' s.slug %}">{{ s.target_url }}</a>
           <span class="ts">{{ s.created_at|date:"M j, H:i" }}</span>
         </li>
       {% endfor %}
     </ul>
+  {% else %}
+    <p class="no-history">No scans yet — results will appear here after your first scan.</p>
   {% endif %}
+
 {% endblock %}

@@ -11,6 +11,7 @@ Core scanning logic for VibeCheck.
 """
 from __future__ import annotations
 
+from .errors import friendly_error
 import ipaddress
 import re
 import socket
@@ -323,8 +324,8 @@ def run_scan(target_url: str) -> ScanResult:
     try:
         page_resp = _get(target_url)
     except (requests.RequestException, SSRFError) as exc:
-        result.ok = False
-        result.error = str(exc)
+        result.ok    = False
+        result.error = friendly_error(exc)   # ← was: str(exc) / f"Could not fetch..."
         return result
 
     html = page_resp.text

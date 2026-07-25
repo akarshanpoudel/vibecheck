@@ -431,3 +431,31 @@ footer {
   border-top: 1px solid var(--faint);
   padding-top: 20px;
 }
+/* ---- History header (label + clear button on the same line) ---- */
+.history-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+}
+.btn-ghost--sm {
+  font-size: 12px;
+  padding: 4px 10px;
+  /* Add these to override the solid .btn styles */
+  background: transparent;
+  color: var(--muted);
+}
+
+.btn-ghost--sm:hover {
+  color: var(--text);
+}
+
+/* ---- Empty history notice ---- */
+.no-history {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 12px 0 0;
+  border-top: 1px solid var(--faint);
+  padding-top: 14px;
+}

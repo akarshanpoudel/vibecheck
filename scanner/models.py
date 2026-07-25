@@ -1,4 +1,9 @@
+import secrets
 from django.db import models
+
+
+def _new_slug() -> str:
+    return secrets.token_urlsafe(10)
 
 
 class Scan(models.Model):
@@ -6,13 +11,14 @@ class Scan(models.Model):
     STATUS_COMPLETE = "complete"
     STATUS_FAILED   = "failed"
 
-    target_url      = models.URLField(max_length=2000)
-    created_at      = models.DateTimeField(auto_now_add=True)
-    ok              = models.BooleanField(default=True)
-    error           = models.TextField(blank=True, default="")
-    assets_scanned  = models.JSONField(default=list, blank=True)
+    slug             = models.CharField(max_length=20, unique=True, db_index=True, default=_new_slug)
+    target_url       = models.URLField(max_length=2000)
+    created_at       = models.DateTimeField(auto_now_add=True)
+    ok               = models.BooleanField(default=True)
+    error            = models.TextField(blank=True, default="")
+    assets_scanned   = models.JSONField(default=list, blank=True)
     endpoints_probed = models.JSONField(default=list, blank=True)
-    status          = models.CharField(max_length=20, default=STATUS_COMPLETE)
+    status           = models.CharField(max_length=20, default=STATUS_COMPLETE)
 
     class Meta:
         ordering = ["-created_at"]
@@ -29,14 +35,14 @@ class Finding(models.Model):
         ("low",      "Low"),
     ]
 
-    scan         = models.ForeignKey(Scan, related_name="findings", on_delete=models.CASCADE)
-    finding_type = models.CharField(max_length=50)
-    title        = models.CharField(max_length=255)
-    severity     = models.CharField(max_length=20, choices=SEVERITY_CHOICES)
-    evidence     = models.TextField()
-    location     = models.CharField(max_length=2000)
+    scan           = models.ForeignKey(Scan, related_name="findings", on_delete=models.CASCADE)
+    finding_type   = models.CharField(max_length=50)
+    title          = models.CharField(max_length=255)
+    severity       = models.CharField(max_length=20, choices=SEVERITY_CHOICES)
+    evidence       = models.TextField()
+    location       = models.CharField(max_length=2000)
     recommendation = models.TextField()
-    category     = models.CharField(max_length=50, default="generic")
+    category       = models.CharField(max_length=50, default="generic")
 
     class Meta:
         ordering = ["severity"]

@@ -1,5 +1,10 @@
 {% extends "scanner/base.html" %}
 
+{% block extra_meta %}
+  {# Result pages contain redacted secrets and target URLs — keep them out of search indexes #}
+  <meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
 {% block content %}
 
   {# ---- Async: scan still running ---- #}
@@ -15,7 +20,7 @@
       (function () {
         var delay = 2500;
         function poll() {
-          fetch("{% url 'scanner:status' scan.id %}")
+          fetch("{% url 'scanner:status' scan.slug %}")  {# ← was scan.id #}
             .then(function (r) { return r.json(); })
             .then(function (d) {
               if (d.status !== "pending") { window.location.reload(); }
