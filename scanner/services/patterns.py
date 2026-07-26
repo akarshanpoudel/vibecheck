@@ -201,6 +201,41 @@ KEY_PATTERNS = [
         severity="medium",
         category="generic",
     ),
+    # ---- Next.js / Vite / CRA exposed environment variables ----
+    #
+    # These prefixes intentionally expose variables to the browser bundle:
+    #   NEXT_PUBLIC_*  → Next.js
+    #   VITE_*         → Vite
+    #   REACT_APP_*    → Create React App
+    #
+    # Developers sometimes accidentally apply them to secrets.
+    # We match on the variable *name* when it contains a secret-sounding
+    # keyword — the value may be caught separately by a provider pattern.
+    dict(
+        name="Framework-exposed secret variable (NEXT_PUBLIC_ / VITE_ / REACT_APP_)",
+        pattern=re.compile(
+            r'\b(?:NEXT_PUBLIC|VITE|REACT_APP)_[A-Z0-9_]*'
+            r'(?:SECRET|PRIVATE|API_KEY|TOKEN|PASSWORD|CREDENTIAL|AUTH_KEY)'
+            r'[A-Z0-9_]*\b',
+            re.IGNORECASE,
+        ),
+        severity="high",
+        category="generic",
+    ),
+
+    dict(
+        name="API key in JSON server props",
+        pattern=re.compile(
+            r'"(?:api|secret|private|auth|openai|anthropic|stripe|gemini)'
+            r'[_-]?(?:key|token|secret)"'
+            r'\s*:\s*"([A-Za-z0-9_\-]{16,})"',
+            re.IGNORECASE,
+        ),
+        context=re.compile(r'pageProps|serverProps|__NEXT_DATA__|initialProps', re.IGNORECASE),
+        context_window=500,
+        severity="critical",
+        category="generic",
+    ),
 ]
 
 LLM_KEY_NAMES = {p["name"] for p in KEY_PATTERNS if p["category"] == "llm"}
