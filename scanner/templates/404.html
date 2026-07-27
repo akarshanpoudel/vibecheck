@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Not found — VibeCheck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'scanner/style.css' %}">
+</head>
+<body>
+  <div class="wrap">
+    <span class="overline">404</span>
+    <h1>Nothing here.</h1>
+    <p class="sub">
+      That scan result may have expired, or the URL is wrong.
+      Results aren't stored indefinitely.
+    </p>
+    <a class="back-link" href="/">&#8592; Back to scanner</a>
+    <footer>
+      VibeCheck reads only what a visitor's browser already receives — HTML, linked JS bundles, and HTTP headers.
+    </footer>
+  </div>
+</body>
+</html>

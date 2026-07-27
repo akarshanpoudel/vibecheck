@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Something went wrong — VibeCheck</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: #0c0c0c;
+      color: #e4e2dd;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 800px; margin: 0 auto; padding: 72px 24px; }
+    .overline {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #5a5a5a;
+      display: block;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: clamp(26px, 4.5vw, 40px);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -.025em;
+      margin: 0 0 16px;
+    }
+    .sub { color: #5a5a5a; font-size: 16px; max-width: 50ch; margin: 0 0 40px; }
+    a {
+      color: #5a5a5a;
+      text-decoration: none;
+      font-size: 13px;
+      transition: color .12s;
+    }
+    a:hover { color: #e4e2dd; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="overline">500</span>
+    <h1>Something went wrong.</h1>
+    <p class="sub">An unexpected error occurred. Try again in a moment.</p>
+    <a href="/">&#8592; Back to scanner</a>
+  </div>
+</body>
+</html>
