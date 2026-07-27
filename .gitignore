@@ -1,6 +1,73 @@
+# ---- Python -------------------------------------------------------
 __pycache__/
-*.pyc
-db.sqlite3
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# ---- Virtual environments -----------------------------------------
 venv/
+.venv/
+env/
+ENV/
+# (the venv folder is already visible in your VS Code explorer — good, it's there)
+
+# ---- Django -------------------------------------------------------
+# The SQLite file contains real scan records, sessions, and user data
+db.sqlite3
+
+# collectstatic output — regenerated from source, never committed
+staticfiles/
+
+# Django local settings override (if you ever add one)
+vibecheck/local_settings.py
+
+# ---- Secrets and environment --------------------------------------
+# .env.example is committed (it has no real values)
+# .env is not (it has real values)
 .env
-data.json
+.env.*
+!.env.example
+
+# ---- Database dumps -----------------------------------------------
+# Any file produced by `manage.py dumpdata` or pg_dump
+*.json
+!package.json
+!package-lock.json
+# If you'd rather be more surgical than blocking all .json:
+# data.json
+# db_dump*.json
+# dumps/
+
+# ---- Logs ---------------------------------------------------------
+*.log
+logs/
+
+# ---- Testing and coverage -----------------------------------------
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+coverage.xml
+
+# ---- OS files -----------------------------------------------------
+.DS_Store          # macOS
+Thumbs.db          # Windows
+desktop.ini        # Windows
+ehthumbs.db        # Windows
+
+# ---- Editors ------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Deployment artefacts -----------------------------------------
+# Heroku/Render build artifacts, not source
+.heroku/
