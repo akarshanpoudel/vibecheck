@@ -2,6 +2,15 @@
 
 {% block extra_meta %}
   <meta name="robots" content="noindex, nofollow">
+  {% if scan.status == "complete" and scan.ok %}
+    {# OG / social preview — search engines respect noindex; social crawlers mostly don't #}
+    <meta property="og:type"        content="website">
+    <meta property="og:title"       content="VibeCheck — {{ scan.target_url }}">
+    <meta property="og:description" content="{% if is_clean %}No exposed keys or misconfigurations found.{% else %}{% if counts.critical %}{{ counts.critical }} critical{% endif %}{% if counts.high %}, {{ counts.high }} high{% endif %}{% if counts.medium %}, {{ counts.medium }} medium{% endif %} issue{{ counts.critical|add:counts.high|add:counts.medium|pluralize }} found.{% endif %}">
+    <meta name="twitter:card"       content="summary">
+    <meta name="twitter:title"      content="VibeCheck — {{ scan.target_url }}">
+    <meta name="twitter:description"content="{% if is_clean %}No issues found in this client-side scan.{% else %}Security issues found — view the full report.{% endif %}">
+  {% endif %}
 {% endblock %}
 
 {% block content %}
