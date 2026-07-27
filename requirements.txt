@@ -2,3 +2,5 @@ Django>=5.2,<7.0
 requests>=2.31
 beautifulsoup4>=4.12
 psycopg2-binary>=2.9
+whitenoise>=6.7
+gunicorn>=22.0
