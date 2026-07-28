@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from django.http import JsonResponse
@@ -10,28 +11,26 @@ from .forms import ScanForm
 from .models import Scan
 from .tasks import start_scan
 
+logger = logging.getLogger(__name__)
+
 PENDING_TIMEOUT = timedelta(minutes=3)
 MAX_HISTORY     = 10
 
 
 def _push_history(request, slug: str) -> None:
-    """Add a slug to the front of this visitor's session history."""
     history = request.session.get("scan_history", [])
-    history = [s for s in history if s != slug]  # remove if already present (re-scan)
+    history = [s for s in history if s != slug]
     history.insert(0, slug)
     request.session["scan_history"] = history[:MAX_HISTORY]
 
 
-def _get_history(request) -> list:
-    """Return this visitor's scans in session order, completed only."""
+def _get_history(request) -> list[Scan]:
     slugs = request.session.get("scan_history", [])
     if not slugs:
         return []
     by_slug = {
         s.slug: s
-        for s in Scan.objects.filter(
-            slug__in=slugs
-        ).exclude(status=Scan.STATUS_PENDING)
+        for s in Scan.objects.filter(slug__in=slugs).exclude(status=Scan.STATUS_PENDING)
     }
     return [by_slug[slug] for slug in slugs if slug in by_slug]
 
@@ -41,18 +40,22 @@ def index(request):
     form = ScanForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
+        target_url = form.cleaned_data["target_url"]
         scan = Scan.objects.create(
-            target_url=form.cleaned_data["target_url"],
+            target_url=target_url,
             status=Scan.STATUS_PENDING,
             ok=True,
         )
         start_scan(scan)
         _push_history(request, scan.slug)
+        logger.info("scan.started url=%s slug=%s", target_url, scan.slug)
         return redirect(reverse("scanner:result", args=[scan.slug]))
 
+    scan_count = Scan.objects.filter(status=Scan.STATUS_COMPLETE).count()
     return render(request, "scanner/index.html", {
         "form":         form,
         "recent_scans": _get_history(request),
+        "scan_count":   scan_count,
     })
 
 
@@ -65,10 +68,18 @@ def result(request, slug: str):
             scan.ok     = False
             scan.error  = "Scan timed out — the worker may have been interrupted. Please try again."
             scan.save(update_fields=["status", "ok", "error"])
+            logger.warning("scan.timeout slug=%s", slug)
         else:
             return render(request, "scanner/result.html", {"scan": scan})
 
     findings = scan.findings.all()
+    is_clean  = scan.ok and findings.count() == 0
+
+    if scan.ok:
+        logger.info(
+            "scan.complete slug=%s findings=%d clean=%s",
+            slug, findings.count(), is_clean,
+        )
 
     return render(request, "scanner/result.html", {
         "scan":                  scan,
@@ -81,7 +92,7 @@ def result(request, slug: str):
             "high":     findings.filter(severity="high").count(),
             "medium":   findings.filter(severity="medium").count(),
         },
-        "is_clean": scan.ok and findings.count() == 0,
+        "is_clean": is_clean,
     })
 
 
@@ -91,12 +102,10 @@ def scan_status(request, slug: str):
 
 
 def clear_history(request):
-    """POST-only. Wipes this visitor's scan history from their session."""
     if request.method == "POST":
         request.session.pop("scan_history", None)
     return redirect(reverse("scanner:index"))
 
 
 def health(request):
-    """GET /health/ — for load balancers and uptime monitors."""
     return JsonResponse({"ok": True})
