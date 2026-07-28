@@ -3,13 +3,12 @@
 {% block extra_meta %}
   <meta name="robots" content="noindex, nofollow">
   {% if scan.status == "complete" and scan.ok %}
-    {# OG / social preview — search engines respect noindex; social crawlers mostly don't #}
-    <meta property="og:type"        content="website">
-    <meta property="og:title"       content="VibeCheck — {{ scan.target_url }}">
-    <meta property="og:description" content="{% if is_clean %}No exposed keys or misconfigurations found.{% else %}{% if counts.critical %}{{ counts.critical }} critical{% endif %}{% if counts.high %}, {{ counts.high }} high{% endif %}{% if counts.medium %}, {{ counts.medium }} medium{% endif %} issue{{ counts.critical|add:counts.high|add:counts.medium|pluralize }} found.{% endif %}">
-    <meta name="twitter:card"       content="summary">
-    <meta name="twitter:title"      content="VibeCheck — {{ scan.target_url }}">
-    <meta name="twitter:description"content="{% if is_clean %}No issues found in this client-side scan.{% else %}Security issues found — view the full report.{% endif %}">
+    <meta property="og:type"         content="website">
+    <meta property="og:title"        content="VibeCheck — {{ scan.target_url }}">
+    <meta property="og:description"  content="{% if is_clean %}No exposed keys or misconfigurations found.{% else %}{% if counts.critical %}{{ counts.critical }} critical{% endif %}{% if counts.high %}, {{ counts.high }} high{% endif %}{% if counts.medium %}, {{ counts.medium }} medium{% endif %} issue{{ counts.critical|add:counts.high|add:counts.medium|pluralize }} found.{% endif %}">
+    <meta name="twitter:card"        content="summary">
+    <meta name="twitter:title"       content="VibeCheck — {{ scan.target_url }}">
+    <meta name="twitter:description" content="{% if is_clean %}No issues found in this client-side scan.{% else %}Security issues found — view the full report.{% endif %}">
   {% endif %}
 {% endblock %}
 
@@ -19,8 +18,6 @@
   {% if scan.status == "pending" %}
     <span class="overline">Scanning</span>
     <h1>{{ scan.target_url }}</h1>
-
-    {# id="vc-pending" and data-status-url are picked up by main.js #}
     <div class="pending-state"
          id="vc-pending"
          data-status-url="{% url 'scanner:status' scan.slug %}">
@@ -34,10 +31,7 @@
     <span class="overline">Scan result</span>
     <h1>Couldn't reach that URL</h1>
     <div class="error-box">{{ scan.error }}</div>
-    <div class="action-row">
-      <a class="back-link" href="{% url 'scanner:index' %}">&larr; Try another URL</a>
-      <button class="btn-ghost" id="vc-copy-link" type="button">Copy link</button>
-    </div>
+    <a class="back-link" href="{% url 'scanner:index' %}">&larr; Try another URL</a>
 
   {# ---- Normal result ---- #}
   {% else %}
@@ -128,15 +122,33 @@
       {% endfor %}
     {% endif %}
 
+    {# ---- Action row ---- #}
     <div class="action-row">
       <a class="back-link" href="{% url 'scanner:index' %}">&larr; Scan another URL</a>
-      <div class="action-row-right">
+      <div class="action-btns">
+
+        {# Re-scan — secondary, outlined #}
         <form method="post" action="{% url 'scanner:index' %}">
           {% csrf_token %}
           <input type="hidden" name="target_url" value="{{ scan.target_url }}">
-          <button class="btn-ghost" type="submit">Re-scan</button>
+          <button class="btn-rescan" type="submit">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+              <path d="M2 6.5a4.5 4.5 0 1 0 .9-2.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M2 2v3h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Re-scan
+          </button>
         </form>
-        <button class="btn-ghost" id="vc-copy-link" type="button">Copy link</button>
+
+        {# Copy link — primary, solid #}
+        <button class="btn-copy" id="vc-copy-link" type="button">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M1 9V1h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Copy link
+        </button>
+
       </div>
     </div>
 

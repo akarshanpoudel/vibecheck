@@ -1,4 +1,5 @@
 {% extends "scanner/base.html" %}
+{% load humanize %}
 
 {% block content %}
   <span class="overline">Client-side exposure scanner</span>
@@ -20,10 +21,15 @@
       {% endif %}
       <button class="btn" type="submit">Scan</button>
     </form>
-    <p class="disclaimer">
-      Only checks what's already public. No login walls, no brute-forcing, no
-      third-party domains probed beyond your target host.
-    </p>
+    <div class="form-footer">
+      <p class="disclaimer">
+        Only checks what's already public. No login walls, no brute-forcing,
+        no third-party domains probed beyond your target host.
+      </p>
+      {% if scan_count %}
+        <span class="scan-counter">{{ scan_count|intcomma }} URL{{ scan_count|pluralize }} scanned</span>
+      {% endif %}
+    </div>
   </div>
 
   <h2>What we check</h2>
