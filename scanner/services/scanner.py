@@ -13,6 +13,7 @@ Scan order (matters for deduplication — first occurrence of a key wins):
 from __future__ import annotations
 
 import ipaddress
+import logging
 import re
 import socket
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -25,6 +26,11 @@ from bs4 import BeautifulSoup
 from .errors import friendly_error
 from .patterns import KEY_PATTERNS
 
+# Place executable variable assignments AFTER all imports
+logger = logging.getLogger(__name__)
+
+
+MAX_ASSET_BYTES = 5 * 1024 * 1024   # 5 MB hard cap per JS asset
 USER_AGENT          = "VibeCheckScanner/1.0 (+https://vibecheck.example.com/about)"
 REQUEST_TIMEOUT     = 8
 MAX_JS_ASSETS       = 12
@@ -127,6 +133,7 @@ class Finding:
     location:       str
     recommendation: str
     category:       str = "generic"
+    confidence: str = "medium" 
 
 
 @dataclass
@@ -190,6 +197,7 @@ def _scan_text_for_secrets(text: str, source_label: str) -> list[Finding]:
                 location=source_label,
                 recommendation="",
                 category=spec["category"],
+                confidence=spec.get("confidence", "medium"),
             ))
     return findings
 
@@ -295,9 +303,32 @@ def _discover_js_assets(soup: BeautifulSoup, base_url: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def _fetch_js_asset(js_url: str) -> tuple[str, str] | None:
-    """Fetch one JS bundle. Returns (url, text) or None on any error."""
+    """Fetch one JS bundle with a 5 MB size cap. Returns (url, text) or None."""
     try:
-        return js_url, _get(js_url).text
+        resp = _get(js_url, stream=True)
+
+        # Content-Length fast-reject (not always present, never trusted fully)
+        try:
+            cl = int(resp.headers.get("Content-Length", 0))
+            if cl > MAX_ASSET_BYTES:
+                logger.info("asset.skipped.too_large url=%s declared_bytes=%d", js_url, cl)
+                resp.close()
+                return None
+        except (ValueError, TypeError):
+            pass
+
+        # Stream and accumulate with a hard ceiling
+        chunks: list[bytes] = []
+        total = 0
+        for chunk in resp.iter_content(chunk_size=65_536):   # 64 KB chunks
+            chunks.append(chunk)
+            total += len(chunk)
+            if total > MAX_ASSET_BYTES:
+                logger.info("asset.truncated url=%s bytes_read=%d", js_url, total)
+                resp.close()
+                return None
+
+        return js_url, b"".join(chunks).decode("utf-8", errors="replace")
     except (requests.RequestException, SSRFError):
         return None
 
