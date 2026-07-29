@@ -3,7 +3,9 @@ Background scanning task.
 Imported by views.py and admin.py to avoid duplication and circular imports.
 """
 import threading
+
 from django.db import connection
+
 from .models import Finding, Scan
 from .services.recommendations import (
     OPEN_ENDPOINT_RECOMMENDATION,

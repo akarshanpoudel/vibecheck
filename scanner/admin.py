@@ -7,7 +7,6 @@ from django.utils.html import format_html
 from .models import Finding, Scan
 from .tasks import start_scan
 
-
 # ---- Actions --------------------------------------------------------
 
 @admin.action(description="Re-run selected scans")

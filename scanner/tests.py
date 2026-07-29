@@ -12,9 +12,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from scanner.models import Finding, Scan
-from scanner.services.scanner import SSRFError, _assert_safe_url
 from scanner.services.patterns import KEY_PATTERNS
-
+from scanner.services.scanner import SSRFError, _assert_safe_url
 
 # ---------------------------------------------------------------------------
 # SSRF
