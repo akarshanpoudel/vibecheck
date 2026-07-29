@@ -25,6 +25,7 @@ from bs4 import BeautifulSoup
 
 from .errors import friendly_error
 from .patterns import KEY_PATTERNS
+from .utils import normalise_url
 
 # Place executable variable assignments AFTER all imports
 logger = logging.getLogger(__name__)
@@ -403,6 +404,7 @@ def _probe_endpoint(url: str) -> tuple[Finding | None, requests.Response] | None
 def run_scan(target_url: str) -> ScanResult:
     if not target_url.startswith(("http://", "https://")):
         target_url = "https://" + target_url
+        target_url = normalise_url(target_url) 
 
     result = ScanResult(target_url=target_url, ok=True)
 
