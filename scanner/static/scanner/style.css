@@ -555,3 +555,23 @@ footer {
   outline: 2px solid var(--text);
   outline-offset: 2px;
 }
+/* ---- Confidence badge ---- */
+.finding-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.conf-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--rsm);
+}
+
+.conf-tag.conf-high   { background: rgba(46,168,112,0.08);  color: #2ea870; }
+.conf-tag.conf-medium { background: rgba(76,130,240,0.08);  color: #4c82f0; }
+.conf-tag.conf-low    { background: rgba(90,90,90,0.1);     color: var(--muted); }
