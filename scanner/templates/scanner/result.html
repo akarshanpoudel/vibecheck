@@ -68,7 +68,10 @@
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
             <div class="finding-title">{{ f.title }}</div>
-            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+            <div class="finding-badges">
+              <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+              <span class="conf-tag conf-{{ f.confidence }}">{{ f.confidence }}</span>
+            </div>
           </div>
           <div class="finding-location">{{ f.location }}</div>
           <div class="evidence">{{ f.evidence }}</div>
@@ -83,7 +86,10 @@
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
             <div class="finding-title">{{ f.title }}</div>
-            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+            <div class="finding-badges">
+              <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+              <span class="conf-tag conf-{{ f.confidence }}">{{ f.confidence }}</span>
+            </div>
           </div>
           <div class="finding-location">{{ f.location }}</div>
           <div class="evidence">{{ f.evidence }}</div>
@@ -98,7 +104,10 @@
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
             <div class="finding-title">{{ f.title }}</div>
-            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+            <div class="finding-badges">
+              <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+              <span class="conf-tag conf-{{ f.confidence }}">{{ f.confidence }}</span>
+            </div>
           </div>
           <div class="finding-location">{{ f.location }}</div>
           <div class="evidence">{{ f.evidence }}</div>
@@ -113,7 +122,10 @@
         <div class="finding-card {{ f.severity }}">
           <div class="finding-top">
             <div class="finding-title">{{ f.title }}</div>
-            <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+            <div class="finding-badges">
+              <span class="sev-tag {{ f.severity }}">{{ f.severity }}</span>
+              <span class="conf-tag conf-{{ f.confidence }}">{{ f.confidence }}</span>
+            </div>
           </div>
           <div class="finding-location">{{ f.location }}</div>
           <div class="evidence">{{ f.evidence }}</div>
