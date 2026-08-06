@@ -49,9 +49,13 @@
           {% if counts.medium %}<span class="pill medium"><span class="dot"></span>{{ counts.medium }} medium</span>{% endif %}
         {% endif %}
       </div>
-      <div class="scan-stats">
-        {{ scan.assets_scanned|length }} JS file{{ scan.assets_scanned|length|pluralize }} scanned
-        {% if scan.endpoints_probed %}&middot; {{ scan.endpoints_probed|length }} endpoint{{ scan.endpoints_probed|length|pluralize }} probed{% endif %}
+     <div class="scan-stats">
+        {% if scan.assets_scanned %}
+          {{ scan.assets_scanned|length }} JS file{{ scan.assets_scanned|length|pluralize }} scanned
+          {% if scan.endpoints_probed %}&middot; {{ scan.endpoints_probed|length }} endpoint{{ scan.endpoints_probed|length|pluralize }} probed{% endif %}
+        {% else %}
+          No linked JS assets found — inline scripts were still checked.
+        {% endif %}
       </div>
     </div>
 
