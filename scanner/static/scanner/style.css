@@ -575,3 +575,31 @@ footer {
 .conf-tag.conf-high   { background: rgba(46,168,112,0.08);  color: #2ea870; }
 .conf-tag.conf-medium { background: rgba(76,130,240,0.08);  color: #4c82f0; }
 .conf-tag.conf-low    { background: rgba(90,90,90,0.1);     color: var(--muted); }
+
+/* ---- Mobile error UX ------------------------------------------------ */
+
+/* Form is now a column so errors appear above the input row, not
+   hidden below the button on small screens */
+.scan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* The actual input + button sit in their own flex row */
+.scan-input-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Error list no longer needs width:100% since it's outside the row */
+.errorlist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: var(--critical);
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+}
