@@ -3,11 +3,11 @@
 :root {
   --bg:      #0c0c0c;
   --surface: #141414;
-  --border:  #222;
+  --border:  #333333; /* Slightly lighter so borders are visible */
   --faint:   #1c1c1c;
   --text:    #e4e2dd;
-  --muted:   #5a5a5a;
-  --dim:     #303030;
+  --muted:   #9ca3af; /* Changed from #5a5a5a to a readable medium-light gray */
+  --dim:     #6b7280; /* Changed from #303030 for better interactive states */
 
   --critical: #f03e3e;
   --high:     #e8920a;
@@ -18,7 +18,9 @@
   --rsm: 4px;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
@@ -73,13 +75,23 @@ h2 {
 }
 
 /* ---- Scan form ---- */
-.scan-area { margin-bottom: 80px; }
+.scan-area {
+  margin-bottom: 80px;
+}
 
+/* Mobile error UX: Form is a column so errors appear above the input row */
 .scan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* The actual input + button sit in their own flex row */
+.scan-input-row {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
 }
 
 .url-input {
@@ -121,20 +133,46 @@ h2 {
   outline-offset: 2px;
 }
 
+.btn-ghost--sm {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.btn-ghost--sm:hover {
+  color: var(--text);
+}
+
 .errorlist {
   list-style: none;
   padding: 0;
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--critical);
   font-size: 12px;
   font-family: 'JetBrains Mono', monospace;
-  width: 100%;
 }
 
 .disclaimer {
   font-size: 12.5px;
   color: var(--muted);
   margin: 0;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.scan-counter {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Feature list ---- */
@@ -166,6 +204,14 @@ h2 {
 }
 
 /* ---- Recent scans ---- */
+.history-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
 .recent-list {
   list-style: none;
   padding: 0;
@@ -202,6 +248,14 @@ h2 {
   flex-shrink: 0;
 }
 
+.no-history {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 12px 0 0;
+  border-top: 1px solid var(--faint);
+  padding-top: 14px;
+}
+
 /* ---- Result page ---- */
 .result-meta {
   margin-bottom: 40px;
@@ -217,7 +271,11 @@ h2 {
   margin-bottom: 16px;
 }
 
-.tally { display: flex; gap: 8px; flex-wrap: wrap; }
+.tally { 
+  display: flex; 
+  gap: 8px; 
+  flex-wrap: wrap; 
+}
 
 .pill {
   font-size: 12px;
@@ -229,7 +287,12 @@ h2 {
   gap: 6px;
 }
 
-.pill .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.pill .dot { 
+  width: 6px; 
+  height: 6px; 
+  border-radius: 50%; 
+  flex-shrink: 0; 
+}
 
 .pill.critical { background: rgba(240,62,62,0.1); color: var(--critical); }
 .pill.critical .dot { background: var(--critical); }
@@ -304,6 +367,13 @@ h2 {
   color: var(--text);
 }
 
+.finding-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .sev-tag {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
@@ -317,6 +387,19 @@ h2 {
 .sev-tag.critical { background: rgba(240,62,62,0.12); color: var(--critical); }
 .sev-tag.high     { background: rgba(232,146,10,0.12); color: var(--high); }
 .sev-tag.medium   { background: rgba(76,130,240,0.12); color: var(--medium); }
+
+.conf-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--rsm);
+}
+
+.conf-tag.conf-high   { background: rgba(46,168,112,0.08);  color: #2ea870; }
+.conf-tag.conf-medium { background: rgba(76,130,240,0.08);  color: #4c82f0; }
+.conf-tag.conf-low    { background: rgba(90,90,90,0.1);     color: var(--muted); }
 
 .finding-location {
   font-family: 'JetBrains Mono', monospace;
@@ -391,96 +474,15 @@ h2 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scan-indicator::after { animation: none; transform: translateX(0); background: var(--muted); }
+  .scan-indicator::after { 
+    animation: none; 
+    transform: translateX(0); 
+    background: var(--muted); 
+  }
 }
 
-.pending-state .msg   { font-size: 14px; color: var(--muted); margin: 0 0 6px; }
-.pending-state .hint  { font-size: 12px; color: var(--dim); margin: 0; }
-
-/* ---- Back / nav ---- */
-.back-link {
-  display: inline-block;
-  margin-top: 36px;
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 13px;
-  transition: color 0.12s;
-}
-
-.back-link:hover { color: var(--text); }
-
-.back-link:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* ---- Rate limit page ---- */
-.rate-limit-msg p {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 0 0 8px;
-}
-
-/* ---- Footer ---- */
-footer {
-  margin-top: 96px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.7;
-  border-top: 1px solid var(--faint);
-  padding-top: 20px;
-}
-/* ---- History header (label + clear button on the same line) ---- */
-.history-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 0;
-}
-.btn-ghost--sm {
-  font-size: 12px;
-  padding: 4px 10px;
-  /* Add these to override the solid .btn styles */
-  background: transparent;
-  color: var(--muted);
-}
-
-.btn-ghost--sm:hover {
-  color: var(--text);
-}
-
-/* ---- Empty history notice ---- */
-.no-history {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 12px 0 0;
-  border-top: 1px solid var(--faint);
-  padding-top: 14px;
-}
-/* ---- Action row right group (re-scan + copy-link) ---- */
-.action-row-right {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-/* ---- Form footer (disclaimer + scan counter on one line) ----------- */
-.form-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.scan-counter {
-  font-size: 12px;
-  color: var(--muted);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
+.pending-state .msg  { font-size: 14px; color: var(--muted); margin: 0 0 6px; }
+.pending-state .hint { font-size: 12px; color: var(--dim); margin: 0; }
 
 /* ---- Action row ---------------------------------------------------- */
 .action-row {
@@ -498,7 +500,8 @@ footer {
   margin-top: 0;
 }
 
-.action-btns {
+.action-btns,
+.action-row-right {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -555,51 +558,38 @@ footer {
   outline: 2px solid var(--text);
   outline-offset: 2px;
 }
-/* ---- Confidence badge ---- */
-.finding-badges {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-shrink: 0;
+
+/* ---- Back / nav ---- */
+.back-link {
+  display: inline-block;
+  margin-top: 36px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.12s;
 }
 
-.conf-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: var(--rsm);
+.back-link:hover { color: var(--text); }
+
+.back-link:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-.conf-tag.conf-high   { background: rgba(46,168,112,0.08);  color: #2ea870; }
-.conf-tag.conf-medium { background: rgba(76,130,240,0.08);  color: #4c82f0; }
-.conf-tag.conf-low    { background: rgba(90,90,90,0.1);     color: var(--muted); }
-
-/* ---- Mobile error UX ------------------------------------------------ */
-
-/* Form is now a column so errors appear above the input row, not
-   hidden below the button on small screens */
-.scan-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 12px;
+/* ---- Rate limit page ---- */
+.rate-limit-msg p {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 8px;
 }
 
-/* The actual input + button sit in their own flex row */
-.scan-input-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* Error list no longer needs width:100% since it's outside the row */
-.errorlist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  color: var(--critical);
+/* ---- Footer ---- */
+footer {
+  margin-top: 96px;
+  color: var(--muted);
   font-size: 12px;
-  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.7;
+  border-top: 1px solid var(--faint);
+  padding-top: 20px;
 }
