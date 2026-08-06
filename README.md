@@ -1,7 +1,7 @@
 # VibeCheck
 
 Scans any public web app for exposed LLM API keys, open API endpoints,
-and CORS misconfigurations — using only what a visitor's browser
+and CORS misconfigurations using only what a visitor's browser
 already receives.
 
 ## What it checks
@@ -15,7 +15,7 @@ already receives.
 ## Local setup
 
 ```bash
-git clone https://github.com/yourname/vibecheck
+git clone https://github.com/akarshanpoudel/vibecheck
 cd vibecheck
 python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
